@@ -18,8 +18,6 @@
 
 #import "RLMTestCase.h"
 
-#if 0
-
 @interface NonRLMIntObject : NSObject
 @property (nonatomic) int intCol;
 @end
@@ -556,37 +554,6 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 #endif
 
-- (void)testRealmKVO {
-    RLMRealm *realm = RLMRealm.defaultRealm;
-    [realm beginWriteTransaction];
-
-    IntObject *obj1 = [IntObject createInDefaultRealmWithValue:@[@5]];
-    IntObject *obj2 = [IntObject allObjects].firstObject;
-
-    [obj2 addObserver:self forKeyPath:@"intCol" options:0 context:0];
-
-    [self measureBlock:^{
-        for (int i = 0; i < 1000; ++i)
-            obj1.intCol = 10;
-    }];
-
-    [realm commitWriteTransaction];
-    [obj2 removeObserver:self forKeyPath:@"intCol"];
-}
-
-- (void)testNativeKVO {
-    NonRLMIntObject *obj = [NonRLMIntObject new];
-
-    [obj addObserver:self forKeyPath:@"intCol" options:0 context:0];
-
-    [self measureBlock:^{
-        for (int i = 0; i < 1000; ++i)
-            obj.intCol = 10;
-    }];
-
-    [obj removeObserver:self forKeyPath:@"intCol"];
-}
-
 - (void)testKvoManyObjects {
     RLMRealm *realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
@@ -599,7 +566,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         [o addObserver:self forKeyPath:@"intCol" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
 
     [self measureBlock:^{
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 100; ++i) {
             for (IntObject *o in arr)
                 o.intCol = 0;
         }
@@ -609,10 +576,77 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         [o removeObserver:self forKeyPath:@"intCol"];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+- (void)testKvoManyObjectsModifyUnobserved {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+    NSMutableArray *arr = [NSMutableArray new];
+    for (int i = 0; i < 10000; ++i) {
+        [arr addObject:[IntObject createInDefaultRealmWithValue:@[@0]]];
+    }
+
+    for (IntObject *o in arr)
+        [o addObserver:self forKeyPath:@"intCol" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
+
+    IntObject *o = [IntObject createInDefaultRealmWithValue:@[@0]];
+    [self measureBlock:^{
+        for (int i = 0; i < 1000; ++i) {
+            o.intCol = 0;
+        }
+    }];
+
+    for (IntObject *o in arr)
+        [o removeObserver:self forKeyPath:@"intCol"];
 }
 
->>>>>>> Make RLMObjects Key-Value Observing compliant
+- (void)testKvoManyObjectsModifyUnobservedBaseline {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+    NSMutableArray *arr = [NSMutableArray new];
+    for (int i = 0; i < 10000; ++i) {
+        [arr addObject:[IntObject createInDefaultRealmWithValue:@[@0]]];
+    }
+
+    IntObject *o = [IntObject createInDefaultRealmWithValue:@[@0]];
+    [self measureBlock:^{
+        for (int i = 0; i < 1000; ++i) {
+            o.intCol = 0;
+        }
+    }];
+}
+
+- (void)testKvoManyObjectsRefresh {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+    NSMutableArray *arr = [NSMutableArray new];
+    for (int i = 0; i < 10000; ++i) {
+        [arr addObject:[IntObject createInDefaultRealmWithValue:@[@0]]];
+    }
+    [realm commitWriteTransaction];
+
+    for (IntObject *o in arr)
+        [o addObserver:self forKeyPath:@"intCol" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
+
+    dispatch_queue_t queue = dispatch_queue_create("queue", 0);
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        dispatch_async(queue, ^{
+            RLMRealm *realm = RLMRealm.defaultRealm;
+            [realm beginWriteTransaction];
+            for (IntObject *o in [IntObject allObjects])
+                o.intCol = 0;
+            [realm commitWriteTransaction];
+        });
+        dispatch_sync(queue, ^{});
+        [self startMeasuring];
+        [realm refresh];
+    }];
+
+    for (IntObject *o in arr)
+        [o removeObserver:self forKeyPath:@"intCol"];
+}
+
+- (void)observeValueForKeyPath:(__unused NSString *)keyPath ofObject:(__unused id)object change:(__unused NSDictionary *)change context:(__unused void *)context {
+}
+
 @end
 
-#endif
+//#endif

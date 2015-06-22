@@ -204,7 +204,6 @@
 		3F8DCA6D19930F960008BD7F /* MixedTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBD1955FE0100FDED82 /* MixedTests.m */; };
 		3F8DCA6E19930F960008BD7F /* ObjectInterfaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBE1955FE0100FDED82 /* ObjectInterfaceTests.m */; };
 		3F8DCA6F19930F960008BD7F /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBF1955FE0100FDED82 /* ObjectTests.m */; };
-		3F8DCA7019930F960008BD7F /* PerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */; };
 		3F8DCA7119930F960008BD7F /* PropertyTypeTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC01955FE0100FDED82 /* PropertyTypeTest.mm */; };
 		3F8DCA7219930F960008BD7F /* QueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC11955FE0100FDED82 /* QueryTests.m */; };
 		3F8DCA7319930F960008BD7F /* RealmTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC31955FE0100FDED82 /* RealmTests.mm */; };
@@ -218,6 +217,7 @@
 		3FC1F3DB1B20C003009C92E3 /* RLMObservation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FC1F3D71B20C003009C92E3 /* RLMObservation.mm */; };
 		3FC1F3DC1B20C003009C92E3 /* RLMObservation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FC1F3D71B20C003009C92E3 /* RLMObservation.mm */; };
 		3FC1F3DD1B20C003009C92E3 /* RLMObservation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FC1F3D71B20C003009C92E3 /* RLMObservation.mm */; };
+		3FCAECEE1B38CA4100D47B87 /* PerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */; };
 		3FDCFEB619F6A8D3005E414A /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		3FDE338C19C37E4C003B7DBA /* RLMSwiftSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */; };
 		3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
@@ -1355,7 +1355,6 @@
 				3F8DCA6E19930F960008BD7F /* ObjectInterfaceTests.m in Sources */,
 				021A88391AAFB5CF00EEAC84 /* ObjectSchemaTests.m in Sources */,
 				3F8DCA6F19930F960008BD7F /* ObjectTests.m in Sources */,
-				3F8DCA7019930F960008BD7F /* PerformanceTests.m in Sources */,
 				02AFB4661A80343600E11938 /* PropertyTests.m in Sources */,
 				3F8DCA7119930F960008BD7F /* PropertyTypeTest.mm in Sources */,
 				3F8DCA7219930F960008BD7F /* QueryTests.m in Sources */,
@@ -1482,6 +1481,7 @@
 				E81A1FEB1955FE0100FDED82 /* RealmTests.mm in Sources */,
 				02AFB4671A80343600E11938 /* ResultsTests.m in Sources */,
 				027A4D2D1AB1012500AA46F9 /* RLMMultiProcessTestCase.m in Sources */,
+				3FCAECEE1B38CA4100D47B87 /* PerformanceTests.m in Sources */,
 				E8A5DEED1968E520006A50F6 /* RLMPredicateUtil.m in Sources */,
 				3FDCFEB619F6A8D3005E414A /* RLMSupport.swift in Sources */,
 				E81A1FEE1955FE0100FDED82 /* RLMTestCase.m in Sources */,
