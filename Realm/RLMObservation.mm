@@ -28,6 +28,27 @@
 
 #import <realm/lang_bind_helper.hpp>
 
+namespace {
+    template<typename Iterator>
+    struct IteratorPair {
+        Iterator first;
+        Iterator second;
+    };
+    template<typename Iterator>
+    Iterator begin(IteratorPair<Iterator> const& p) {
+        return p.first;
+    }
+    template<typename Iterator>
+    Iterator end(IteratorPair<Iterator> const& p) {
+        return p.second;
+    }
+
+    template<typename Container>
+    auto reverse(Container const& c) {
+        return IteratorPair<typename Container::const_reverse_iterator>{c.rbegin(), c.rend()};
+    }
+}
+
 RLMObservationInfo::RLMObservationInfo(RLMObjectSchema *objectSchema, std::size_t row, id object)
 : object(object)
 , objectSchema(objectSchema)
@@ -315,21 +336,21 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
             }
         }
 
-        for (auto const& change : changes) {
-            change.info->willChange(change.property, NSKeyValueChangeRemoval, change.indexes);
-        }
         for (auto info : invalidated) {
             info->willChange(RLMInvalidatedKey);
             info->prepareForInvalidation();
+        }
+        for (auto const& change : changes) {
+            change.info->willChange(change.property, NSKeyValueChangeRemoval, change.indexes);
         }
     });
 
     block();
 
-    for (auto const& change : changes) {
+    for (auto const& change : reverse(changes)) {
         change.info->didChange(change.property, NSKeyValueChangeRemoval, change.indexes);
     }
-    for (auto info : invalidated) {
+    for (auto info : reverse(invalidated)) {
         info->didChange(RLMInvalidatedKey);
     }
 
@@ -392,15 +413,16 @@ class TransactLogHandler {
     }
 
     // Send didChange notifications to all observers marked as needing them
+    // Loop in reverse order to avoid O(N^2) behavior in Foundation
     void notifyObservers() {
-        for (auto const& o : observers) {
+        for (auto const& o : reverse(observers)) {
             o.forEach([&](size_t i, auto const& change) {
                 o.info->didChange([o.info->getObjectSchema().properties[i] name],
                                   change.linkviewChangeKind,
                                   change.linkviewChangeIndexes);
             });
         }
-        for (auto const& info : invalidated) {
+        for (auto const& info : reverse(invalidated)) {
             info->didChange(RLMInvalidatedKey);
         }
     }
@@ -440,17 +462,17 @@ public:
     }
 
     void parse_complete() {
+        for (auto info : invalidated) {
+            info->willChange(RLMInvalidatedKey);
+            info->prepareForInvalidation();
+        }
+
         for (auto const& o : observers) {
             o.forEach([&](size_t i, auto const& change) {
                 o.info->willChange([o.info->getObjectSchema().properties[i] name],
                                    change.linkviewChangeKind,
                                    change.linkviewChangeIndexes);
             });
-        }
-
-        for (auto info : invalidated) {
-            info->willChange(RLMInvalidatedKey);
-            info->prepareForInvalidation();
         }
     }
 
